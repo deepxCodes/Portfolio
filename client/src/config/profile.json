@@ -1,0 +1,64 @@
+{
+  "profile": {
+    "name": "Joydeep Ghosh",
+    "display_name": "DeepxCodes",
+    "bio": "\"Turning coffee into code, ideas into reality, and bugs into features.\"",
+    "headline": "Computer Science Explorer \u2014 Cybersecurity | C/C++ | Frontend | Python",
+    "socials": [
+      {
+        "icon": "github",
+        "label": "GitHub",
+        "href": "https://github.com/deepxCodes"
+      },
+      {
+        "icon": "linkedin",
+        "label": "LinkedIn",
+        "href": "https://www.linkedin.com/"
+      },
+      {
+        "icon": "instagram",
+        "label": "Instagram",
+        "href": "https://instagram.com/"
+      },
+      {
+        "icon": "globe",
+        "label": "Website",
+        "href": "https://deepxcodes.dev"
+      }
+    ]
+  },
+  "sections": {
+    "about": "I\u2019m a Computer Science Explorer with a strong passion for cybersecurity (ethical testing), C/C++, frontend development (HTML, CSS, JavaScript, React), Python automation, and game development. I enjoy building and securing systems, learning by doing, and shipping projects that teach.",
+    "experience": [
+      {
+        "title": "Open-source & Projects",
+        "detail": "Creator/maintainer of small projects; contributors to tooling and learning projects."
+      },
+      {
+        "title": "Languages & Tools",
+        "detail": "Proficient in C, C++, Python, JavaScript; familiar with Kali Linux and penetration testing tools."
+      }
+    ],
+    "highlights": [
+      {
+        "title": "Current Journey",
+        "detail": "Mastering Cybersecurity, building projects in C/C++ & Python, improving frontend skills, and experimenting with game engines."
+      },
+      {
+        "title": "Popular Repos",
+        "detail": "deepxcodings, Tic-Tac-Toe_UI, C-Programings \u2014 check my GitHub for code samples and learning projects."
+      }
+    ],
+    "skills": [
+      "C",
+      "C++",
+      "Python",
+      "HTML5",
+      "CSS3",
+      "JavaScript",
+      "React",
+      "Kali Linux",
+      "Penetration Testing"
+    ]
+  }
+}

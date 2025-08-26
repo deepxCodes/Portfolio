@@ -13,7 +13,7 @@ services:
         value: 10000
 
   # Frontend: React + Tailwind
-  - type: static_site
+  - type: vite
     name: mern-frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: build

@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
+function scrollToSection(id) {
+  const el = document.getElementById(id.replace('#', ''));
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
 const links = [
   { href: '#home', label: 'Home' },
   { href: '#about', label: 'About' },
@@ -30,7 +35,14 @@ export default function Navbar() {
       <ul className="flex items-center gap-4">
         {links.map((l) => (
           <li key={l.href}>
-            <a href={l.href} className="text-sm text-neutral-200 hover:text-white transition">
+            <a
+              href={l.href}
+              className="text-sm text-neutral-200 hover:text-white transition"
+              onClick={e => {
+                e.preventDefault();
+                scrollToSection(l.href);
+              }}
+            >
               {l.label}
             </a>
           </li>

@@ -20,18 +20,8 @@ const gh = axios.create({
 });
 
 function extractSectionsFromMarkdown(md) {
-  // Extract sections based on headings and bullets
-  // Returns { about, experience, highlights, skills, rawHtml }
   const tokens = marked.lexer(md);
-  let current = null;
   const sections = { about: "", experience: [], highlights: [], skills: [] };
-  const lines = md.split("\n");
-
-  // Quick-n-dirty detection by headings
-  const joinBuffer = [];
-  let currentSection = "about";
-
-  // Map some common headings to a normalized bucket
   const mapHeading = (text) => {
     const t = text.toLowerCase();
     if (t.includes("about")) return "about";
@@ -42,47 +32,34 @@ function extractSectionsFromMarkdown(md) {
     return "about";
   };
 
-  // Parse with marked tokens for more structure
   let bufferText = "";
+  let currentSection = "about";
   let highlightBuffer = [];
   let experienceBuffer = [];
 
   tokens.forEach(tok => {
     if (tok.type === "heading") {
-      // Flush previous buffer
       if (currentSection === "about" && bufferText.trim()) {
         sections.about += bufferText + "\n";
       }
       bufferText = "";
       currentSection = mapHeading(tok.text || "");
     } else if (tok.type === "paragraph") {
-      if (currentSection === "about") {
-        bufferText += (tok.text || "") + "\n\n";
-      } else if (currentSection === "experience") {
-        experienceBuffer.push(tok.text || "");
-      } else if (currentSection === "highlights") {
-        highlightBuffer.push(tok.text || "");
-      } else if (currentSection === "skills") {
-        sections.skills.push(tok.text || "");
-      }
+      if (currentSection === "about") bufferText += (tok.text || "") + "\n\n";
+      else if (currentSection === "experience") experienceBuffer.push(tok.text || "");
+      else if (currentSection === "highlights") highlightBuffer.push(tok.text || "");
+      else if (currentSection === "skills") sections.skills.push(tok.text || "");
     } else if (tok.type === "list") {
       const items = tok.items?.map(i => i.text) || [];
-      if (currentSection === "experience") {
-        experienceBuffer.push(...items);
-      } else if (currentSection === "highlights") {
-        highlightBuffer.push(...items);
-      } else if (currentSection === "skills") {
-        sections.skills.push(...items);
-      } else {
-        bufferText += items.join("\n") + "\n";
-      }
+      if (currentSection === "experience") experienceBuffer.push(...items);
+      else if (currentSection === "highlights") highlightBuffer.push(...items);
+      else if (currentSection === "skills") sections.skills.push(...items);
+      else bufferText += items.join("\n") + "\n";
     }
   });
 
-  // Finalize
   if (bufferText.trim()) sections.about += bufferText.trim();
 
-  // Normalize experience: split into entries using empty lines or " - "
   if (experienceBuffer.length) {
     experienceBuffer.forEach(line => {
       const parts = line.split(" - ");
@@ -94,21 +71,19 @@ function extractSectionsFromMarkdown(md) {
     });
   }
 
-  // Highlights
   sections.highlights = highlightBuffer.filter(Boolean);
-
-  // Deduplicate skills
   sections.skills = Array.from(new Set(sections.skills.flatMap(s => s.split(/[•,|]/g).map(x => x.trim()).filter(Boolean))));
 
   return sections;
 }
 
+// ✅ Health Check
 app.get("/api/health", (req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
+// ✅ Profile Info
 app.get("/api/profile", async (req, res) => {
-  // Minimal profile info from GitHub user
   const username = req.query.username || GITHUB_USERNAME;
   if (!username) return res.status(400).json({ error: "No GitHub username configured or provided." });
   try {
@@ -131,13 +106,13 @@ app.get("/api/profile", async (req, res) => {
   }
 });
 
+// ✅ Profile README
 app.get("/api/readme", async (req, res) => {
   const username = req.query.username || GITHUB_USERNAME;
   if (!username) return res.status(400).json({ error: "No GitHub username configured or provided." });
   try {
-    // Try the special profile README repo: username/username
     const { data: repo } = await gh.get(`/repos/${username}/${username}/readme`, {
-      headers: { Accept: "application/vnd.github.v3.raw" }  // request raw content
+      headers: { Accept: "application/vnd.github.v3.raw" }
     });
     const md = typeof repo === "string" ? repo : (repo.content ? Buffer.from(repo.content, "base64").toString("utf-8") : "");
     const sections = extractSectionsFromMarkdown(md);
@@ -147,6 +122,29 @@ app.get("/api/readme", async (req, res) => {
   }
 });
 
+// ✅ New Projects API
+app.get("/api/projects", async (req, res) => {
+  const username = req.query.username || GITHUB_USERNAME;
+  if (!username) return res.status(400).json({ error: "No GitHub username configured or provided." });
+
+  try {
+    const { data } = await gh.get(`/users/${username}/repos?sort=updated&per_page=10`);
+    const projects = data.map(repo => ({
+      name: repo.name,
+      description: repo.description,
+      url: repo.html_url,
+      stars: repo.stargazers_count,
+      forks: repo.forks_count,
+      language: repo.language,
+      updated_at: repo.updated_at
+    }));
+    res.json({ ok: true, projects });
+  } catch (e) {
+    res.status(500).json({ error: e?.response?.data || e.message });
+  }
+});
+
+// ✅ Start Server
 app.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}`);
 });

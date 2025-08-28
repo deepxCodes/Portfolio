@@ -10,6 +10,7 @@ import profileFallback from './config/profile.json';
 import SocialButtons from "./components/SocialButtons";
 import Projects from "./components/Projects"; 
 import myPhoto from "./assets/myphoto.jpg";
+import GalaxyParticles from "./components/Galaxyparticles";
 
 export default function App() {
   const [profile, setProfile] = useState(null);
@@ -43,6 +44,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen relative">
+      <GalaxyParticles />
+      <div className="relative z-10">
       <AnimatedBackground />
       <ParticlesLayer />
       <Navbar />
@@ -153,18 +156,17 @@ export default function App() {
       </Section>
 
       {/* Contact */}
-      <Section id="contact" title="Contact">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <p className="text-neutral-300">Want to collaborate or have a project in mind? Say hello.</p>
-          <div className="mt-4">
+<section id="contact" className="relative py-16 md:py-24 rounded-2xl border border-white/10 bg-white/5 p-5 min-h-[200px] z-10 shadow-soft">
+          <h2 className="text-2xl font-bold text-center text-white">Contact Me</h2>
+          <p className="text-center mt-4 text-neutral-300">Let's get in touch!</p>
+          <div className="mt-6 flex justify-center">
             <SocialButtons />
           </div>
-        </div>
-      </Section>
-
-      <footer className="py-10 text-center text-sm text-neutral-400">
-        © {new Date().getFullYear()} — Created by {profile?.name || 'Joydeep Ghosh'} 
-      </footer>
+        </section>
+        <footer className="py-10 text-center text-sm text-white">
+          © {new Date().getFullYear()} — Created by {profile?.name || 'Joydeep Ghosh'} 
+        </footer>
+      </div>
     </div>
   );
 }

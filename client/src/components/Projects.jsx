@@ -3,43 +3,70 @@ import { motion } from "framer-motion";
 import Tilt from "react-parallax-tilt";
 import { Github, Play } from "lucide-react";
 
+// 🎯 Custom description for specific projects
+const customDescriptions = {
+  portfolio:
+    "⚡ A modern, interactive portfolio showcasing my work — built with React, Vite, TailwindCSS, and Framer Motion.",
+  "tic-tac-toe_ui":
+    "🎮 A fun and interactive Tic Tac Toe game built with React, featuring smooth animations and a responsive design.",
+};
+
 export default function Projects() {
   const [projects, setProjects] = useState([]);
 
-  // Fetch repos directly from GitHub API
   useEffect(() => {
-    fetch("https://api.github.com/users/deepxCodes/repos") // 👈 replace with your GitHub username
-      .then((res) => res.json())
-      .then((data) => {
-        // Filter or map repos you want to show
-        const formatted = data.map((repo) => ({
-          title: repo.name,
-          description: repo.description || "No description available",
-          link: repo.html_url,
-          demo: repo.homepage || null, // GitHub repo has a "homepage" field if you added one
-        }));
+    const fetchProjects = async () => {
+      try {
+        const res = await fetch("https://api.github.com/users/deepxCodes/repos");
+        const data = await res.json();
+
+        const formatted = data.map((repo) => {
+          let description =
+            customDescriptions[repo.name.toLowerCase()] ||
+            repo.description ||
+            "✨ Coming soon...";
+
+          return {
+            id: repo.id,
+            title: repo.name,
+            description,
+            link: repo.html_url,
+            demo: repo.homepage || null,
+          };
+        });
+
         setProjects(formatted);
-      })
-      .catch((err) => console.error("Error fetching projects:", err));
+      } catch (err) {
+        console.error("❌ Error fetching projects:", err);
+      }
+    };
+
+    fetchProjects();
   }, []);
 
   return (
-    <section id="projects" className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-soft">
+    <section
+      id="projects"
+      className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-soft"
+    >
       <div className="rounded-2xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 hover:border-white/20 transition shadow-soft">
-        <h2 className="text-4xl font-bold text-center mb-12">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 tracking-tight font-[Poppins]">
           🌟 Featured Projects
         </h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
           {projects.length === 0 ? (
-            <p className="text-center text-gray-400">Loading projects...</p>
+            <p className="text-center text-gray-400 font-[Inter]">
+              Loading projects...
+            </p>
           ) : (
             projects.map((project, index) => (
               <motion.div
-                key={index}
+                key={project.id || index}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
+                transition={{ duration: 0.6, delay: index * 0.15 }}
               >
                 <Tilt
                   tiltMaxAngleX={10}
@@ -48,12 +75,13 @@ export default function Projects() {
                   transitionSpeed={400}
                 >
                   <div className="bg-neutral-800/70 backdrop-blur-lg rounded-2xl shadow-lg border border-neutral-700 p-6 hover:shadow-purple-700/40 hover:border-purple-400 transition-all duration-300">
-                    <h3 className="text-2xl font-semibold mb-3">
+                    <h3 className="text-2xl font-semibold mb-3 font-[Sora] tracking-wide text-white">
                       {project.title}
                     </h3>
-                    <p className="text-gray-400 mb-6">{project.description}</p>
+                    <p className="text-gray-300 mb-6 leading-relaxed font-[Inter]">
+                      {project.description}
+                    </p>
 
-                    {/* Buttons */}
                     <div className="flex gap-4">
                       <a
                         href={project.link}

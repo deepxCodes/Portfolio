@@ -4,8 +4,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['ui-sans-serif', 'system-ui'],
-        body: ['Inter', 'ui-sans-serif', 'system-ui']
+        heading: ['Poppins', 'sans-serif'],   // Stylish for headings
+        body: ['Space Grotesk', 'sans-serif'], // Clean modern body font
+        display: ['ui-sans-serif', 'system-ui'], 
       },
       colors: {
         brand: {
@@ -36,5 +37,8 @@ export default {
       }
     }
   },
-  plugins: [require('@tailwindcss/typography'), require('@tailwindcss/forms')],
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms')
+  ]
 }

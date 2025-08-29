@@ -4,11 +4,10 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch index.js",
+    "dev": "nodemon index.js",
     "start": "node index.js"
   },
   "dependencies": {
-    "vite": "^5.0.0",
     "axios": "^1.7.2",
     "compression": "^1.7.4",
     "cors": "^2.8.5",

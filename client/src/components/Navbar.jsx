@@ -52,7 +52,9 @@ export default function Navbar() {
                   scrollToSection(l.href);
                 }}
                 className={`relative text-sm transition ${
-                  active === l.href ? "text-blue-400" : "text-gray-300 hover:text-white"
+                  active === l.href
+                    ? "text-blue-400"
+                    : "text-gray-300 hover:text-white"
                 }`}
               >
                 {l.label}
@@ -94,7 +96,9 @@ export default function Navbar() {
                   setOpen(false);
                 }}
                 className={`block w-full text-left text-base transition ${
-                  active === l.href ? "text-blue-400" : "text-gray-300 hover:text-white"
+                  active === l.href
+                    ? "text-blue-400"
+                    : "text-gray-300 hover:text-white"
                 }`}
               >
                 {l.label}

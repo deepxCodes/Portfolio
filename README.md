@@ -54,4 +54,3 @@ npm run build
 - If no README is found, the UI gracefully falls back to `src/config/profile.json` on the client.
 - Customize colors, sections, and visuals in `client/src/config/profile.json` and `client/src/components/*`.
 
-**Enjoy your new portfolio!**

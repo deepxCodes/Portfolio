@@ -1,19 +1,19 @@
 services:
-  # Backend: Express API + React build serving
   - type: web
-    name: mern-portfolio
+    name: portfolio
     env: node
     plan: free
+    repo: https://github.com/deepxCodes/Portfolio
     buildCommand: |
-      cd client && npm install && npm run build
-      cd ../server && npm install
-    startCommand: node index.js
+      cd client && npm ci && npm run build
+      cd ../server && npm ci
+    startCommand: node server/index.js
     envVars:
-      - key: NODE_VERSION
-        value: 18
-      - key: PORT
-        value: 10000
+      - key: NODE_ENV
+        value: production
       - key: GITHUB_USERNAME
         sync: false
       - key: GITHUB_TOKEN
         sync: false
+      - key: NPM_CONFIG_PRODUCTION
+        value: 'false'

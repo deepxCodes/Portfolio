@@ -31,6 +31,7 @@ GITHUB_USERNAME=your-username-here
 # Optional for higher API limits
 GITHUB_TOKEN=ghp_xxx
 PORT=5050
+```
 ### 2) Install dependencies
 From the repository root:
 

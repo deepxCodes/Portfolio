@@ -91,24 +91,38 @@ export default function App() {
                 </motion.div>
               </div>
 
-              {/* Avatar */}
+                            {/* Avatar */}
               <motion.div
                 className="relative flex items-center justify-center"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6 }}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: window.innerWidth >= 768 ? 1.05 : 1 }} // Hover only on desktop
+                whileTap={{ scale: window.innerWidth < 768 ? 0.95 : 1 }}    // Tap shrink only on mobile
               >
-                <TiltCard>
+                {window.innerWidth >= 768 ? (
+                  <TiltCard>
+                    <div className="relative p-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg backdrop-blur-sm">
+                      <img
+                        src={myPhoto}
+                        alt="Avatar"
+                        className="w-56 h-56 rounded-full object-cover border-4 border-gray-900"
+                        loading="lazy"
+                        draggable={false}
+                      />
+                    </div>
+                  </TiltCard>
+                ) : (
                   <div className="relative p-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg backdrop-blur-sm">
                     <img
                       src={myPhoto}
                       alt="Avatar"
-                      className="w-56 h-56 rounded-full object-cover border-4 border-gray-900"
+                      className="w-36 h-36 md:w-56 md:h-56 rounded-full object-cover border-4 border-gray-900"
                       loading="lazy"
+                      draggable={false}
                     />
                   </div>
-                </TiltCard>
+                )}
               </motion.div>
             </div>
           </div>

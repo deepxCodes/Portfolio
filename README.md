@@ -75,7 +75,9 @@ npm run build
 
 🔥 This portfolio is not just a showcase — it’s a performance-optimized playground for modern frontend tools.
 
+```
 vbnet
 Copy code
 
 Would you like me to also **append a "📸 Demo / Screenshots" section** at the end so your LinkedIn post
+```

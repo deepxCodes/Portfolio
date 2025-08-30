@@ -36,14 +36,14 @@ PORT=5050
 From the repository root:
 
 ```bash
-Copy code
+
 cd server && npm install && cd ../client && npm install
 ```
 ### 3) Run in development
 In two terminals:
 
 ```bash
-Copy code
+
 # Terminal 1 → Run server
 cd server
 npm run dev
@@ -56,7 +56,7 @@ The client will proxy API requests to the server during development.
 ```
 ### 4) Build for production
 ```bash
-Copy code
+
 # Build client
 cd client
 npm run build
@@ -77,7 +77,7 @@ npm run build
 
 ```
 vbnet
-Copy code
+
 
 Would you like me to also **append a "📸 Demo / Screenshots" section** at the end so your LinkedIn post
 ```

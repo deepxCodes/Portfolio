@@ -1,0 +1,19 @@
+services:
+  # Backend: Express API + React build serving
+  - type: web
+    name: mern-portfolio
+    env: node
+    plan: free
+    buildCommand: |
+      cd client && npm install && npm run build
+      cd ../server && npm install
+    startCommand: node index.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: PORT
+        value: 10000
+      - key: GITHUB_USERNAME
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false

@@ -12,28 +12,30 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Support __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const PORT = process.env.PORT || 5050;
 const GITHUB_USERNAME = process.env.GITHUB_USERNAME || "";
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
 
+// GitHub API client
 const gh = axios.create({
   baseURL: "https://api.github.com",
   headers: GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}
 });
 
+// ---------- Helper to parse README ----------
 function extractSectionsFromMarkdown(md) {
-  // Extract sections based on headings and bullets
-  // Returns { about, experience, highlights, skills, rawHtml }
   const tokens = marked.lexer(md);
-  let current = null;
   const sections = { about: "", experience: [], highlights: [], skills: [] };
-  const lines = md.split("\n");
 
-  // Quick-n-dirty detection by headings
-  const joinBuffer = [];
+  let bufferText = "";
+  let highlightBuffer = [];
+  let experienceBuffer = [];
   let currentSection = "about";
 
-  // Map some common headings to a normalized bucket
   const mapHeading = (text) => {
     const t = text.toLowerCase();
     if (t.includes("about")) return "about";
@@ -44,14 +46,8 @@ function extractSectionsFromMarkdown(md) {
     return "about";
   };
 
-  // Parse with marked tokens for more structure
-  let bufferText = "";
-  let highlightBuffer = [];
-  let experienceBuffer = [];
-
-  tokens.forEach(tok => {
+  tokens.forEach((tok) => {
     if (tok.type === "heading") {
-      // Flush previous buffer
       if (currentSection === "about" && bufferText.trim()) {
         sections.about += bufferText + "\n";
       }
@@ -68,7 +64,7 @@ function extractSectionsFromMarkdown(md) {
         sections.skills.push(tok.text || "");
       }
     } else if (tok.type === "list") {
-      const items = tok.items?.map(i => i.text) || [];
+      const items = tok.items?.map((i) => i.text) || [];
       if (currentSection === "experience") {
         experienceBuffer.push(...items);
       } else if (currentSection === "highlights") {
@@ -81,38 +77,47 @@ function extractSectionsFromMarkdown(md) {
     }
   });
 
-  // Finalize
   if (bufferText.trim()) sections.about += bufferText.trim();
 
-  // Normalize experience: split into entries using empty lines or " - "
   if (experienceBuffer.length) {
-    experienceBuffer.forEach(line => {
+    experienceBuffer.forEach((line) => {
       const parts = line.split(" - ");
       if (parts.length >= 2) {
-        sections.experience.push({ title: parts[0], detail: parts.slice(1).join(" - ") });
+        sections.experience.push({
+          title: parts[0],
+          detail: parts.slice(1).join(" - ")
+        });
       } else {
         sections.experience.push({ title: line, detail: "" });
       }
     });
   }
 
-  // Highlights
   sections.highlights = highlightBuffer.filter(Boolean);
-
-  // Deduplicate skills
-  sections.skills = Array.from(new Set(sections.skills.flatMap(s => s.split(/[•,|]/g).map(x => x.trim()).filter(Boolean))));
+  sections.skills = Array.from(
+    new Set(
+      sections.skills
+        .flatMap((s) =>
+          s.split(/[•,|]/g).map((x) => x.trim()).filter(Boolean)
+        )
+    )
+  );
 
   return sections;
 }
 
+// ---------- API Routes ----------
 app.get("/api/health", (req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
 });
 
 app.get("/api/profile", async (req, res) => {
-  // Minimal profile info from GitHub user
   const username = req.query.username || GITHUB_USERNAME;
-  if (!username) return res.status(400).json({ error: "No GitHub username configured or provided." });
+  if (!username)
+    return res
+      .status(400)
+      .json({ error: "No GitHub username configured or provided." });
+
   try {
     const { data } = await gh.get(`/users/${username}`);
     res.json({
@@ -135,29 +140,40 @@ app.get("/api/profile", async (req, res) => {
 
 app.get("/api/readme", async (req, res) => {
   const username = req.query.username || GITHUB_USERNAME;
-  if (!username) return res.status(400).json({ error: "No GitHub username configured or provided." });
+  if (!username)
+    return res
+      .status(400)
+      .json({ error: "No GitHub username configured or provided." });
+
   try {
-    // Try the special profile README repo: username/username
     const { data: repo } = await gh.get(`/repos/${username}/${username}/readme`, {
-      headers: { Accept: "application/vnd.github.v3.raw" }  // request raw content
+      headers: { Accept: "application/vnd.github.v3.raw" }
     });
-    const md = typeof repo === "string" ? repo : (repo.content ? Buffer.from(repo.content, "base64").toString("utf-8") : "");
+    const md =
+      typeof repo === "string"
+        ? repo
+        : repo.content
+        ? Buffer.from(repo.content, "base64").toString("utf-8")
+        : "";
     const sections = extractSectionsFromMarkdown(md);
     res.json({ ok: true, sections, raw: md });
   } catch (e) {
-    res.status(404).json({ ok: false, error: "README not found for profile repo. Create a repo named exactly your username with a README.md" });
+    res.status(404).json({
+      ok: false,
+      error:
+        "README not found for profile repo. Create a repo named exactly your username with a README.md"
+    });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
+// ---------- Serve React Frontend ----------
+app.use(express.static(path.join(__dirname, "../client/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
 });
-// Support __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-app.use(express.static(path.join(__dirname, '../client/dist')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../client/dist', 'index.html'));
+// ---------- Start Server ----------
+app.listen(PORT, () => {
+  console.log(`✅ Server listening on port ${PORT}`);
 });

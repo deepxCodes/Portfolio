@@ -87,7 +87,7 @@ export default function App() {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.15 }}
                 >
-                  <SocialButtons socials={socials} />
+                
                 </motion.div>
               </div>
 

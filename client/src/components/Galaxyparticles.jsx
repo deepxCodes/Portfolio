@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Particles } from "react-tsparticles";
 import { loadStarsPreset } from "tsparticles-preset-stars";
 
@@ -6,6 +6,9 @@ export default function GalaxyParticles() {
   const particlesInit = useCallback(async (engine) => {
     await loadStarsPreset(engine);
   }, []);
+
+  // detect if mobile (small screen)
+  const isMobile = useMemo(() => window.innerWidth < 768, []);
 
   return (
     <Particles
@@ -15,7 +18,18 @@ export default function GalaxyParticles() {
         preset: "stars",
         background: {
           color: "#0a0a23"
-        }
+        },
+        fpsLimit: isMobile ? 30 : 60,   // ⬅ lower FPS on mobile
+        particles: {
+          number: {
+            value: isMobile ? 40 : 120, // ⬅ fewer stars on mobile
+          },
+          move: {
+            speed: isMobile ? 0.7 : 1.0 // ⬅ slower speed on mobile
+          }
+        },
+        detectRetina: true,
+        fullScreen: false
       }}
       style={{
         position: "fixed",

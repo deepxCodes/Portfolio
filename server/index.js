@@ -166,6 +166,40 @@ app.get("/api/readme", async (req, res) => {
   }
 });
 
+// ---------- NEW: Fetch GitHub Projects ----------
+app.get("/api/projects", async (req, res) => {
+  try {
+    const username = req.query.username || GITHUB_USERNAME;
+    if (!username) {
+      return res.status(400).json({ error: "No GitHub username configured or provided." });
+    }
+
+    const { data: repos } = await gh.get(`/users/${username}/repos`, {
+      params: { sort: "updated", per_page: 100 }
+    });
+
+    const projects = repos
+      .filter(repo => !repo.fork && !repo.archived && repo.name !== username)
+      .map(repo => ({
+        title: repo.name.replace(/[-_]/g, " "),
+        description: repo.description || "A cool project worth checking out!",
+        link: repo.html_url,
+        demo: repo.homepage || null,
+        stars: repo.stargazers_count,
+        language: repo.language,
+        updated: repo.updated_at,
+        topics: repo.topics || []
+      }))
+      .sort((a, b) => new Date(b.updated) - new Date(a.updated));
+
+    res.set("Cache-Control", "public, max-age=600"); // cache 10 min
+    res.json(projects);
+  } catch (error) {
+    console.error("Error fetching projects:", error.message);
+    res.status(500).json({ error: "Failed to fetch projects" });
+  }
+});
+
 // ---------- Serve React Frontend ----------
 app.use(express.static(path.join(__dirname, "../client/dist")));
 

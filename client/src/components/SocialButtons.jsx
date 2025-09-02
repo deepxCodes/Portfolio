@@ -1,86 +1,100 @@
-import { motion } from "framer-motion";
-import { Github, Facebook, Instagram, Linkedin } from "lucide-react";
+// Import icons directly
+import githubIcon from "../assets/github.png";
+import facebookIcon from "../assets/facebook.png";
+import instagramIcon from "../assets/instagram.png";
+import linkedinIcon from "../assets/linkedin.png";
 import { useState } from "react";
 
+// Social data
 const socials = [
   {
-    name: "GitHub",
-    icon: <Github className="w-6 h-6" />,
+    name: "GitHub‎ ‎ ",
     url: "https://github.com/deepxCodes",
-    gradient: "from-gray-800 via-gray-700 to-gray-900",
+    color: "rgba(200,200,200,0.8)",
+    icon: githubIcon,
   },
   {
     name: "Facebook",
-    icon: <Facebook className="w-6 h-6" />,
     url: "https://www.facebook.com/share/1G4UFYkeWn/",
-    gradient: "from-blue-500 via-blue-600 to-blue-700",
+    color: "rgba(25,100,230,0.8)",
+    icon: facebookIcon,
   },
   {
     name: "Instagram",
-    icon: <Instagram className="w-6 h-6" />,
     url: "https://instagram.com/rawly.deep",
-    gradient: "from-pink-500 via-purple-500 to-yellow-500",
+    color: "rgba(230,50,150,0.8)",
+    icon: instagramIcon,
   },
   {
     name: "LinkedIn",
-    icon: <Linkedin className="w-6 h-6" />,
     url: "https://linkedin.com/in/joydeep-ghosh-626667323",
-    gradient: "from-sky-600 via-blue-600 to-blue-800",
+    color: "rgba(0,120,210,0.8)",
+    icon: linkedinIcon,
   },
 ];
 
-export default function SocialButtons() {
-  const [coords, setCoords] = useState({ x: 0, y: 0 });
-
+function SocialIcon({ social }) {
+  const [isHovered, setIsHovered] = useState(false);
+  
   return (
-    <div className="flex gap-6 justify-center mt-10 flex-wrap perspective-[1200px]">
-      {socials.map((social, index) => (
-        <motion.a
-          key={index}
-          href={social.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`relative group overflow-hidden p-5 rounded-2xl shadow-lg bg-gradient-to-br ${social.gradient} 
-                      text-white flex items-center gap-3 font-semibold transition-all duration-500`}
-          onMouseMove={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
-            setCoords({ x, y });
-          }}
-          onMouseLeave={() => setCoords({ x: 0, y: 0 })}
+    <a
+      href={social.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex flex-col items-center cursor-pointer mb-3"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{ perspective: "600px" }}
+    >
+      <div
+        className="relative rounded-full flex items-center justify-center"
+        style={{
+          // Make icons smaller on mobile devices
+          width: window.innerWidth < 480 ? "45px" : "60px", 
+          height: window.innerWidth < 480 ? "45px" : "60px",
+          transform: isHovered
+            ? "rotateX(15deg) rotateY(15deg) scale(1.15)"
+            : "rotateX(0) rotateY(0) scale(1)",
+          boxShadow: isHovered
+            ? `0 0 12px ${social.color}, 0 0 24px ${social.color}, 0 0 48px ${social.color}`
+            : `0 0 6px ${social.color}, 0 0 12px ${social.color}`,
+          transition: "all 0.35s ease",
+        }}
+      >
+        <img
+          src={social.icon}
+          alt={social.name}
+          className="w-full h-full p-2 object-contain" 
           style={{
-            transform: `perspective(600px) rotateX(${coords.y / -20}deg) rotateY(${coords.x / 20}deg)`,
+            filter: isHovered
+              ? `drop-shadow(0 0 6px ${social.color}) drop-shadow(0 0 10px ${social.color})`
+              : `drop-shadow(0 0 3px ${social.color})`,
+            transition: "filter 0.3s ease",
           }}
-          whileHover={{ scale: 1.15 }}
-          whileTap={{ scale: 0.9 }}
-          animate={{ y: [0, -4, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          {/* ✨ Shine sweep */}
-          <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent 
-                           group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+        />
+      </div>
+      <span
+        className="text-sm font-medium mt-2 text-white font-space-grotesk tracking-wide"
+        style={{
+          fontFamily: "'Michroma', sans-serif",
+          letterSpacing: "0.02em", // Slightly increased letter spacing
+          textShadow: isHovered ? `0 0 8px ${social.color}` : "none",
+          transition: "text-shadow 0.3s ease",
+          paddingBottom: "4px"
+        }}
+      >
+        {social.name}
+      </span>
+    </a>
+  );
+}
 
-          {/* 🔮 Ripple effect */}
-          <span className="pointer-events-none absolute inset-0 opacity-0 group-active:opacity-100 
-                           animate-ripple bg-white/20 rounded-full" />
-
-          {social.icon}
-          <span className="z-10">{social.name}</span>
-        </motion.a>
+export default function SocialButtons() {
+  return (
+    <div className="flex flex-wrap justify-center gap-3 md:gap-6 mt-10 pb-3">
+      {socials.map((social, i) => (
+        <SocialIcon key={i} social={social} />
       ))}
     </div>
   );
 }
-
-// Extra ripple animation via Tailwind plugin or custom CSS
-// Add this to your global.css if using Tailwind
-/*
-@keyframes ripple {
-  0% { transform: scale(0); opacity: 0.6; }
-  100% { transform: scale(4); opacity: 0; }
-}
-.animate-ripple {
-  animation: ripple 0.6s linear;
-}
-*/

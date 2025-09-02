@@ -65,6 +65,7 @@ export default function App() {
               <div>
                 <motion.h1
                   className="font-heading text-4xl md:text-6xl font-extrabold tracking-tight"
+                  style={{ fontFamily: "'Orbitron', sans-serif" }} // Add this line
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}

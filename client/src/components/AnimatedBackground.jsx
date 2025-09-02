@@ -7,8 +7,8 @@ export default function AnimatedBackground() {
     const isMobile = window.innerWidth < 768;
 
     const lenis = new Lenis({
-      lerp: isMobile ? 0.15 : 0.07, // smoother but less frequent updates on mobile
-      smoothWheel: !isMobile,       // disable smooth wheel on mobile for performance
+      lerp: isMobile ? 0.15 : 0.07, 
+      smoothWheel: !isMobile,       
     });
 
     let frame;

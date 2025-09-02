@@ -19,13 +19,13 @@ export default function GalaxyParticles() {
         background: {
           color: "#0a0a23"
         },
-        fpsLimit: isMobile ? 30 : 60,   // ⬅ lower FPS on mobile
+        fpsLimit: isMobile ? 30 : 60,   
         particles: {
           number: {
-            value: isMobile ? 40 : 120, // ⬅ fewer stars on mobile
+            value: isMobile ? 40 : 120, 
           },
           move: {
-            speed: isMobile ? 0.7 : 1.0 // ⬅ slower speed on mobile
+            speed: isMobile ? 0.7 : 1.0 
           }
         },
         detectRetina: true,

@@ -38,9 +38,10 @@ export default function Navbar() {
     >
       <div className="flex items-center justify-between md:gap-8">
         {/* Logo / Brand */}
-        <div className="text-lg font-bold tracking-wide text-white">
-          Deep<span className="text-blue-400">Verse!</span>
-        </div>
+        <div className="text-lg font-bold tracking-wide text-white" 
+     style={{ fontFamily: "'Michroma', sans-serif" }}>
+  Deep<span className="text-blue-400">Verse!</span>
+</div>
 
         {/* Desktop Links */}
         <ul className="hidden md:flex items-center gap-6 relative">

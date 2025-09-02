@@ -13,31 +13,69 @@ const customDescriptions = {
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch("https://api.github.com/users/deepxCodes/repos");
-        const data = await res.json();
-
-        const formatted = data.map((repo) => {
-          let description =
-            customDescriptions[repo.name.toLowerCase()] ||
-            repo.description ||
-            "✨ Coming soon...";
-
+        // Get username from environment variable or use your default
+        const username = import.meta.env.VITE_GITHUB_USERNAME || "deepxCodes";
+        
+        // Get API URL based on development or production
+        const API_URL = import.meta.env.DEV 
+          ? "http://localhost:5050" 
+          : "";
+          
+        const response = await fetch(`${API_URL}/api/projects?username=${username}`);
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch projects");
+        }
+        
+        const data = await response.json();
+        
+        // Apply custom descriptions if available
+        const formatted = data.map((project) => {
+          // Extract original name from the formatted title or use title
+          const originalName = project.link.split('/').pop().toLowerCase();
+          
           return {
-            id: repo.id,
-            title: repo.name,
-            description,
-            link: repo.html_url,
-            demo: repo.homepage || null,
+            ...project,
+            // Override with custom descriptions when available
+            description: customDescriptions[originalName] || project.description,
+            title: project.title.replace(/-/g, ' ').replace(/_/g, ' ') // Ensure title is properly formatted
           };
         });
-
+        
         setProjects(formatted);
       } catch (err) {
         console.error("❌ Error fetching projects:", err);
+        // Fallback to direct GitHub API as before
+        try {
+          const res = await fetch("https://api.github.com/users/deepxCodes/repos");
+          const data = await res.json();
+
+          const formatted = data.map((repo) => {
+            let description =
+              customDescriptions[repo.name.toLowerCase()] ||
+              repo.description ||
+              "✨ Coming soon...";
+
+            return {
+              id: repo.id,
+              title: repo.name,
+              description,
+              link: repo.html_url,
+              demo: repo.homepage || null,
+            };
+          });
+
+          setProjects(formatted);
+        } catch (fallbackError) {
+          console.error("❌ Fallback also failed:", fallbackError);
+        }
+      } finally {
+        setLoading(false);
       }
     };
 

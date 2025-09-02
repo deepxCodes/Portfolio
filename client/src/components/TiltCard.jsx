@@ -6,13 +6,13 @@ export default function TiltCard({ children }) {
 
   return (
     <Tilt
-      tiltMaxAngleX={isMobile ? 5 : 15}     // gentler tilt on mobile
+      tiltMaxAngleX={isMobile ? 5 : 15}     
       tiltMaxAngleY={isMobile ? 5 : 15}
       perspective={1000}
-      transitionSpeed={isMobile ? 250 : 400} // faster recovery on mobile
-      scale={isMobile ? 1 : 1.05}           // disable scaling on mobile
-      gyroscope={!isMobile}                 // gyroscope off on mobile (saves CPU)
-      glareEnable={false}                   // glare effect disabled (heavy)
+      transitionSpeed={isMobile ? 250 : 400}
+      scale={isMobile ? 1 : 1.05}           
+      gyroscope={!isMobile}                 
+      glareEnable={false}                   
       className="bg-neutral-800/40 rounded-2xl p-6 shadow-lg"
     >
       {children}

@@ -11,68 +11,100 @@ const customDescriptions = {
     "🎮 A fun and interactive Tic Tac Toe game built with React, featuring smooth animations and a responsive design.",
 };
 
+// Add a manual project fallback (ensures Tic Tac Toe shows even if homepage is missing)
+const manualProjects = [
+  {
+    id: "manual-tictactoe",
+    title: "Tic Tac Toe UI",
+    description:
+      "🎮 A fun and interactive Tic Tac Toe game built with React, featuring smooth animations and a responsive design.",
+    link: "https://github.com/deepxCodes/tic-tac-toe_ui",
+    demo: "https://deepxcodes.github.io/tic-tac-toe_ui", // update if different
+  },
+];
+
 export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ✅ REPLACED FETCH LOGIC
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        // Get username from environment variable or use your default
         const username = import.meta.env.VITE_GITHUB_USERNAME || "deepxCodes";
-        
-        // Get API URL based on development or production
-        const API_URL = import.meta.env.DEV 
-          ? "http://localhost:5050" 
-          : "";
-          
-        const response = await fetch(`${API_URL}/api/projects?username=${username}`);
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch projects");
-        }
-        
-        const data = await response.json();
-        
-        // Apply custom descriptions if available
-        const formatted = data.map((project) => {
-          // Extract original name from the formatted title or use title
-          const originalName = project.link.split('/').pop().toLowerCase();
-          
-          return {
-            ...project,
-            // Override with custom descriptions when available
-            description: customDescriptions[originalName] || project.description,
-            title: project.title.replace(/-/g, ' ').replace(/_/g, ' ') // Ensure title is properly formatted
-          };
-        });
-        
-        setProjects(formatted);
-      } catch (err) {
-        console.error("❌ Error fetching projects:", err);
-        // Fallback to direct GitHub API as before
-        try {
-          const res = await fetch("https://api.github.com/users/deepxCodes/repos");
-          const data = await res.json();
+        const API_URL = import.meta.env.DEV ? "http://localhost:5050" : "";
 
-          const formatted = data.map((repo) => {
-            let description =
-              customDescriptions[repo.name.toLowerCase()] ||
-              repo.description ||
-              "✨ Coming soon...";
+        const response = await fetch(
+          `${API_URL}/api/projects?username=${username}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch projects");
+
+        const data = await response.json();
+
+        // ➤ Only include repos that have a live demo, then force-include Tic Tac Toe
+        const formatted = data
+          .filter((p) => !!p.demo)
+          .map((project) => {
+            const originalName = project.link.split("/").pop().toLowerCase();
 
             return {
-              id: repo.id,
-              title: repo.name,
-              description,
-              link: repo.html_url,
-              demo: repo.homepage || null,
+              ...project,
+              description:
+                customDescriptions[originalName] || project.description,
+              title: project.title.replace(/-/g, " ").replace(/_/g, " "),
             };
           });
 
-          setProjects(formatted);
+        // Ensure Tic Tac Toe is present (avoid duplicates)
+        const hasTicTacToe = formatted.some((p) =>
+          p.link.toLowerCase().includes("tic-tac-toe_ui")
+        );
+        const finalList = hasTicTacToe
+          ? formatted
+          : [...formatted, manualProjects[0]];
+
+        setProjects(finalList);
+      } catch (err) {
+        console.error("❌ Error fetching projects:", err);
+
+        // ➤ Fallback to direct GitHub API but only include repos with homepage
+        try {
+          const username = import.meta.env.VITE_GITHUB_USERNAME || "deepxCodes";
+          const res = await fetch(
+            `https://api.github.com/users/${username}/repos`
+          );
+          const data = await res.json();
+
+          const formatted = data
+            .filter((repo) => !!repo.homepage)
+            .map((repo) => {
+              const description =
+                customDescriptions[repo.name.toLowerCase()] ||
+                repo.description ||
+                "✨ Live demo available.";
+
+              return {
+                id: repo.id,
+                title: repo.name.replace(/-/g, " ").replace(/_/g, " "),
+                description,
+                link: repo.html_url,
+                demo: repo.homepage,
+              };
+            });
+
+          // Ensure Tic Tac Toe is present in fallback too
+          const hasTicTacToe = formatted.some((p) =>
+            p.link.toLowerCase().includes("tic-tac-toe_ui")
+          );
+          const finalList = hasTicTacToe
+            ? formatted
+            : [...formatted, manualProjects[0]];
+
+          setProjects(finalList);
         } catch (fallbackError) {
           console.error("❌ Fallback also failed:", fallbackError);
+          // As a last resort, show manual project
+          setProjects(manualProjects);
         }
       } finally {
         setLoading(false);
@@ -120,21 +152,29 @@ export default function Projects() {
                       {project.description}
                     </p>
 
+                    {/* ✅ REPLACED BUTTON SECTION */}
                     <div className="flex gap-4">
-                      <a
+                       <a
                         href={project.link}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="group inline-flex items-center gap-2 px-5 py-2 rounded-xl font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-pink-600 hover:to-purple-600 transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-pink-500/40"
                       >
-                        <Github
-                          className="group-hover:rotate-12 transition-transform"
-                          size={18}
-                        />
+                        <Github className="group-hover:rotate-12 transition-transform" size={18} />
                         GitHub
                       </a>
 
-                      {project.demo ? (
+                      {(!project.demo || project.link.toLowerCase().includes("tic-tac-toe_ui")) ? (
+                        // Tic Tac Toe (no live demo): grey transparent button
+                        <button
+                          disabled
+                          className="group inline-flex items-center gap-2 px-5 py-2 rounded-xl font-medium text-gray-300/80 bg-transparent border border-white/20 hover:border-white/30 hover:bg-white/5 transition-all duration-300 cursor-not-allowed"
+                          title="No live demo available"
+                        >
+                          <Play size={18} /> Live Demo
+                        </button>
+                      ) : (
+                        // Other projects: normal green demo button
                         <a
                           href={project.demo}
                           target="_blank"
@@ -143,15 +183,9 @@ export default function Projects() {
                         >
                           <Play size={18} /> Live Demo
                         </a>
-                      ) : (
-                        <button
-                          disabled
-                          className="group inline-flex items-center gap-2 px-5 py-2 rounded-xl font-medium text-gray-300 bg-gradient-to-r from-neutral-700 to-neutral-800 cursor-not-allowed opacity-60"
-                        >
-                          <Play size={18} /> Live Demo
-                        </button>
                       )}
                     </div>
+                    {/* END OF REPLACED BUTTON SECTION */}
                   </div>
                 </Tilt>
               </motion.div>

@@ -28,7 +28,7 @@
     ]
   },
   "sections": {
-    "about": "I\u2019m a Computer Science Explorer with a strong passion for cybersecurity (ethical testing), C/C++, frontend development (HTML, CSS, JavaScript, React), Python automation, and game development. I enjoy building and securing systems, learning by doing, and shipping projects that teach.",
+"about": "I am a motivated CSE student at Adamas University with a passion for building secure and interactive web experiences. My interest in technology began when I built my first HTML page, and I have since focused my academic and personal projects on Web Development and Cybersecurity. I possess a strong technical foundation in React.js, HTML/CSS, and JavaScript, supported by programming knowledge in Python, C/C++, and SQL. I am dedicated to crafting responsive user interfaces while keeping security best practices in mind. Beyond the screen, I am a creative thinker who enjoys photography, exploring new technologies, and playing the guitar.",
     "experience": [
       {
         "title": "Open-source & Projects",
